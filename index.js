@@ -3,6 +3,7 @@ const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 const { Sequelize, DataTypes } = require('sequelize');
 const config = require('./config/mysql');
+const { jwtSign, jwtVerify } = require('./config/jwt');
 
 const app = new Koa();
 const router = new Router();
@@ -48,9 +49,21 @@ const User = sequelizeSql.define('User',
 })();
 
 router.post('/gateway/user/login', (ctx) => {
-  console.log(ctx.request);
-  ctx.body = 'login success';
+  const token = jwtSign(ctx.request.body)
+  ctx.body = {
+    code: 200,
+    data: token
+  };
   console.log('success')
+})
+
+router.post('/gateway/user/test', (ctx) => {
+  const data = jwtVerify(ctx.request.body.token)
+  ctx.body = {
+    code: 200,
+    data: data
+  };
+  console.log(data)
 })
 
 app.use(bodyParser());
