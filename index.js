@@ -4,9 +4,12 @@ const bodyParser = require('koa-bodyparser');
 const { Sequelize, DataTypes } = require('sequelize');
 const config = require('./config/mysql');
 const { jwtSign, jwtVerify } = require('./config/jwt');
+const checkToken = require('./middleware/check-token');
 
 const app = new Koa();
 const router = new Router();
+
+app.use(checkToken);
 
 const sequelizeSql = new Sequelize(
   config.database,
@@ -45,25 +48,23 @@ const User = sequelizeSql.define('User',
   // 这里是代码
   // 创建一个新用户
   const user = await User.create({ user_name: 'Jane', login_name: 'Doe', login_password: '123' });
-  console.log("Jane's auto-generated ID:", user.id);
 })();
 
 router.post('/gateway/user/login', (ctx) => {
+  const { username } = ctx.request.body;
   const token = jwtSign(ctx.request.body)
+  ctx.cookies.set('AUTH_TOKEN', token)
   ctx.body = {
     code: 200,
-    data: token
+    username,
   };
-  console.log('success')
 })
 
 router.post('/gateway/user/test', (ctx) => {
-  const data = jwtVerify(ctx.request.body.token)
   ctx.body = {
     code: 200,
-    data: data
+    data: 'success'
   };
-  console.log(data)
 })
 
 app.use(bodyParser());
