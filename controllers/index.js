@@ -1,3 +1,7 @@
-const LoginRouter = require('./login');
+const Router = require('koa-router');
+const router = new Router();
+const login = require('./login');
 
-module.exports = LoginRouter;
+router.use('/', login);
+
+module.exports = router;
