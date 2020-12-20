@@ -18,8 +18,4 @@ const User = sequelize.define('User',
   },
 );
 
-// (async () => {
-//   const user = await User.create({ user_name: 'Jane', login_name: 'Doe', login_password: '123' });
-// })();
-
 module.exports = User;

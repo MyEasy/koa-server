@@ -1,29 +1,20 @@
 const fs = require('fs');
+const path = require('path');
 
-const addMapping = (router, mapping) => {
-  for (let url in mapping) {
-    if (url.startsWith('GET ')) {
-      const path = url.substring(4);
-      router.get(path, mapping[url]);
-    } else if (url.startsWith('POST ')) {
-      const path = url.substring(5);
-      router.post(path, mapping[url]);
-    } else if (url.startsWith('PUT ')) {
-      const path = url.substring(5);
-      router.put(path, mapping[url]);
-    } else if (url.startsWith('DELETE ')) {
-      const path = url.substring(7);
-      router.del(path, mapping[url]);
-    }
-  }
+const addMapping = (router, routers) => {
+  routers.forEach(route => {
+    const { type, url, success } = route;
+    router[type](url, success);
+  })
 };
 
 const addControllers = (router, dir) => {
-  fs.readdirSync(__dirname + '/' + dir).filter(f => {
+  const dirPath = path.resolve(__dirname, '..');
+  fs.readdirSync(dirPath + '/' + dir).filter(f => {
     return f.endsWith('.js');
   }).forEach(f => {
-    const mapping = require(__dirname + '/' + dir + '/' + f);
-    addMapping(router, mapping)
+    const routers = require(dirPath + '/' + dir + '/' + f);
+    addMapping(router, routers)
   });
 };
 
